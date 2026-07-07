@@ -6,12 +6,10 @@ install -D -m 0755 olb/psu_app "$STAGE$APP_INSTALL_DIR/psu_app"
 # Launcher wrapper:
 #  1. Pick the SDL video driver (Wayland -> kmsdrm -> offscreen), same probe
 #     as the other SDL2 examples (see SDL2_HelloWorld for rationale).
-#  2. Run Open LabBench with a DMM driver + the 320x170 dmm-compact view.
-#     Defaults to the synthetic demo driver so it works with no hardware.
-#     Override via env to talk to a real meter, e.g.:
-#       DMM_DRIVER=owon-xdm       DMM_PORT=/dev/ttyUSB0
-#       DMM_DRIVER=keysight-34461a DMM_PORT=usbtmc:/dev/usbtmc0
-#       DMM_DRIVER=hp-3458a        DMM_PORT=prologix:/dev/ttyUSB0:22
+#  2. Launch the keyboard-driven picker (psu_app --pick): choose the meter
+#     and port on-screen, then it opens the 320x170 compact view in-process.
+#     No env vars / no flags needed. (psu_app still accepts --driver/--view/
+#     --port directly for scripting, but the app entry point is the picker.)
 cat >"$STAGE$INSTALL_PREFIX/bin/$PKG_NAME" <<EOF
 #!/bin/sh
 LOG=/tmp/$PKG_NAME.log
@@ -53,14 +51,7 @@ if [ -z "\${SDL_VIDEODRIVER:-}" ]; then
     export SDL_VIDEODRIVER
 fi
 
-# DMM selection (env-overridable; defaults to the synthetic demo driver).
-DRIVER="\${DMM_DRIVER:-dmm-demo}"
-VIEW="\${DMM_VIEW:-dmm-compact}"
-PORT="\${DMM_PORT:--}"
-set -- --driver="\$DRIVER" --view="\$VIEW" --port="\$PORT"
-[ -n "\${DMM_BAUD:-}" ] && set -- "\$@" --baud="\$DMM_BAUD"
-
-echo "[$PKG_NAME] driver=\$SDL_VIDEODRIVER dmm=\$DRIVER view=\$VIEW port=\$PORT uid=\$(id -u)" >>"\$LOG" 2>&1
-exec $APP_INSTALL_DIR/psu_app "\$@" >>"\$LOG" 2>&1
+echo "[$PKG_NAME] driver=\$SDL_VIDEODRIVER mode=picker uid=\$(id -u)" >>"\$LOG" 2>&1
+exec $APP_INSTALL_DIR/psu_app --pick "\$@" >>"\$LOG" 2>&1
 EOF
 chmod 0755 "$STAGE$INSTALL_PREFIX/bin/$PKG_NAME"

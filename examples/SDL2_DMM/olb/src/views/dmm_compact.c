@@ -151,8 +151,10 @@ static void render(app_t *a) {
     /* Mode label, top-left of panel. */
     draw_text(r, a->font_mode, dmm_mode_label(a->reading.mode), 16, py + 8, COL_MODE);
 
-    /* Big VFD reading, centered. dot_size 4 gives a bold small-screen glyph. */
-    int dot_size = 4, dot_gap = 1, char_gap = 6;
+    /* Big VFD reading, centered. Small dots (radius 2, 1px gap) render sharp
+     * on the 320x170 panel -- ~25px/glyph so a full high-resolution field
+     * fits with room for the unit, instead of a few blobby digits. */
+    int dot_size = 2, dot_gap = 1, char_gap = 5;
     int char_h = vfd_char_height(dot_size, dot_gap);
     int vfd_y  = py + (ph - char_h) / 2 + 6;
     vfd_color_t vfd_off = { 0, 22, 13, 255 };
@@ -172,9 +174,10 @@ static void render(app_t *a) {
     } else {
         const char *prefix = "";
         float scaled = engineering_scale(a->reading.value, &prefix);
-        /* Keep ~5 significant digits so the field fits 320px wide. */
+        /* ~6 significant digits (the sharp small-dot field is wide enough):
+         * XXX.XXX / XX.XXXX / X.XXXXX. */
         float abs_v = fabsf(scaled);
-        int decimals = (abs_v >= 100.0f) ? 2 : (abs_v >= 10.0f) ? 3 : 4;
+        int decimals = (abs_v >= 100.0f) ? 3 : (abs_v >= 10.0f) ? 4 : 5;
         char vbuf[24];
         snprintf(vbuf, sizeof(vbuf), "%.*f", decimals, scaled);
 

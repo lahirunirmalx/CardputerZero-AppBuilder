@@ -3,48 +3,47 @@
 A digital-multimeter app for the CardputerZero (320x170), packaging the
 [Open LabBench](https://github.com/lahirunirmalx/open-lab-bench) instrument
 suite (MIT). It works out of the box with a synthetic **demo** driver and
-drives **real meters** over USB-serial, USB-TMC, or Prologix GPIB - no code
-changes, just environment variables.
+drives **real meters** over USB-serial, USB-TMC, or Prologix GPIB - selected
+on-screen, no config files or environment variables.
 
 The full Open LabBench source is vendored under [`olb/`](olb/). This example
-adds one small-screen view, `dmm-compact` (see
-[`olb/src/views/dmm_compact.c`](olb/src/views/dmm_compact.c)): a 320x170
-stacked layout with a mode label, a big centered VFD dot-matrix reading with
-engineering-scaled units, and AUTO / rate / OL badges.
+adds two small-screen pieces:
 
-## Run (demo, no hardware)
+- `dmm-compact` view ([`olb/src/views/dmm_compact.c`](olb/src/views/dmm_compact.c)):
+  a 320x170 stacked layout with a mode label, a big centered VFD dot-matrix
+  reading (sharp small dots) with engineering-scaled units, and AUTO / rate /
+  OL badges.
+- a keyboard-driven picker ([`olb/src/app/dmm_picker.c`](olb/src/app/dmm_picker.c)):
+  choose the **meter** and **port** on-screen, then it launches the compact
+  view for that meter.
 
-In the desktop emulator or on-device the launcher defaults to the demo driver:
+## Use
 
-```
-sdl2-dmm            # == psu_app --driver=dmm-demo --view=dmm-compact --port=-
-```
-
-## Run against a real meter
-
-The launcher reads these environment variables (all optional):
-
-| Var          | Meaning                       | Example                        |
-|--------------|-------------------------------|--------------------------------|
-| `DMM_DRIVER` | driver id                     | `owon-xdm`, `keysight-34461a`, `hp-3458a` |
-| `DMM_PORT`   | transport / device            | `/dev/ttyUSB0`, `usbtmc:/dev/usbtmc0`, `prologix:/dev/ttyUSB0:22` |
-| `DMM_BAUD`   | serial baud (serial drivers)  | `115200`                       |
-| `DMM_VIEW`   | view id                       | `dmm-compact` (default), `dmm-toolbar`, `dmm-full` |
-
-Examples:
+Launch the app (or `psu_app --pick`). You get the picker:
 
 ```
-# OWON XDM over USB-serial
-DMM_DRIVER=owon-xdm DMM_PORT=/dev/ttyUSB0 sdl2-dmm
-
-# Keysight 34461A over USB-TMC (kernel usbtmc driver)
-DMM_DRIVER=keysight-34461a DMM_PORT=usbtmc:/dev/usbtmc0 sdl2-dmm
-
-# HP 3458A over a Prologix GPIB-USB adapter at GPIB address 22
-DMM_DRIVER=hp-3458a DMM_PORT=prologix:/dev/ttyUSB0:22 sdl2-dmm
+Select Multimeter
+ METER                 PORT
+ Fluke 8846A ...       demo (no hardware)
+ Keithley 2000 ...     /dev/ttyUSB0
+ ...                   /dev/ttyACM0
+ HP 3458A ...          usbtmc:/dev/usbtmc0
+ Demo DMM (synthetic)  prologix:/dev/ttyUSB0:22
+                       custom...
+ arrows move  TAB col  ENTER connect  ESC quit
 ```
 
-Run `psu_app --list` to see every built-in driver and view id.
+- **Up / Down** move within a column, **TAB** (or Left/Right) switches between
+  METER and PORT.
+- **ENTER** connects: opens the chosen meter on the chosen port and shows the
+  live reading. **ESC** in the reading returns to the picker.
+- Pick **custom...** and press ENTER to type any port string (a second ENTER
+  accepts it), e.g. `prologix:/dev/ttyUSB0:15`.
+- Defaults are **Demo DMM** + **demo** port, so ENTER works with no hardware.
+
+Advanced: `psu_app` still accepts `--driver=<id> --view=<id> --port=<dev>
+[--baud=<n>]` directly for scripting; `psu_app --list` prints every built-in
+driver and view id.
 
 ## Transports (built in)
 

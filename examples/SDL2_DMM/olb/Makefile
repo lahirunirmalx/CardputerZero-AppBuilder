@@ -136,7 +136,7 @@ BINS := $(APP_BINS) $(TOOL_BINS) $(LEGACY_BINS)
 
 # Per-binary source lists.
 psu_app$(EXE_SUFFIX)_SRCS := \
-    src/app/psu_app.c src/app/launcher.c \
+    src/app/psu_app.c src/app/launcher.c src/app/dmm_picker.c \
     $(PLATFORM_SRC) $(TRANSPORT_SRCS) $(DRIVER_SRCS) $(VIEW_SRCS)
 
 psu_probe$(EXE_SUFFIX)_SRCS := \

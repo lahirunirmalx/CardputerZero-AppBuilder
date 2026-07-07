@@ -17,6 +17,7 @@
 
 #include "drivers/registry.h"
 #include "dmm_driver.h"
+#include "dmm_picker.h"
 #include "launcher.h"
 #include "platform/platform.h"
 #include "psu_driver.h"
@@ -151,6 +152,10 @@ int main(int argc, char **argv) {
         if (strcmp(argv[i], "--list") == 0 || strcmp(argv[i], "-l") == 0) {
             list_all();
             return 0;
+        }
+        if (strcmp(argv[i], "--pick") == 0) {
+            /* Keyboard-driven DMM picker (meter + port), for small panels. */
+            return dmm_picker_run();
         }
         if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
             usage(stdout, argv[0]);
