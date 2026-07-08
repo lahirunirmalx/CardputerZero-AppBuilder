@@ -1,0 +1,9 @@
+{
+  "package_name": "demo-nrf24spectrum",
+  "version": "0.1",
+  "app_name": "nRF24 Spectrum",
+  "bin_name": "demo-nrf24spectrum",
+  "description": "2.4 GHz spectrum analyzer driving an nRF24L01 over SPI/GPIO (phosphor scope + waterfall)",
+  "runtime": "legacy-deb-only",
+  "caps": ["keyboard", "filesystem"]
+}

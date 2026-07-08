@@ -29,7 +29,7 @@ jobs:
         run: |
           set -euo pipefail
           # List directories that have packaging/meta.env
-          mapfile -t DIRS < <(find . -mindepth 3 -maxdepth 3 -path '*/packaging/meta.env' -printf '%h\n' \
+          mapfile -t DIRS < <(find . -mindepth 3 -maxdepth 4 -path '*/packaging/meta.env' -printf '%h\n' \
               | sed 's|^\./||; s|/packaging$||' | sort)
           if [ "${#DIRS[@]}" -eq 0 ]; then
               echo "matrix={\"include\":[]}" >>"$GITHUB_OUTPUT"
